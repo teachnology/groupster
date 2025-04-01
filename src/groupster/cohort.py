@@ -1,35 +1,54 @@
-import pandas as pd
 import random
-
+import pandas as pd
+from .group import Group
 
 # bools and nums should be dics with weights
 
-class Cohort:
+
+class Cohort(Group):
     def __init__(self, data, groups, bools=None, nums=None):
-        group_col = [group for group, count in groups.items() for _ in range(count)]
-        data = data.assign(
+        self.data = data.assign(
             group=lambda df_: random.sample(
                 [group for group, count in groups.items() for _ in range(count)],
                 k=len(df_),
             )
         ).astype({"group": "category"})
 
-        self.data = data
         self.bools = list(bools) if bools is not None else []
         self.nums = list(nums) if nums is not None else []
-        # self.groups = groups
 
-    def diversity(self):
-        # Bool variables
-        bool_mean = {col: self.data.loc[:, col].mean() for col in self.bools}
+    def __getitem__(self, group):
+        return Group(
+            data=self.data.loc[self.data.group == group, :],
+            bools=self.bools,
+            nums=self.nums,
+        )
 
-        # Means of numerical variables
-        num_mean = {f'{col}_mean': self.data.loc[:, col].mean() for col in self.nums}
+    def cost(self, cost_fn=None):
+        return sum(
+            self[group].cost(self.diversity(), cost_fn=cost_fn)
+            for group in self.data.group.unique()
+        )
 
-        # Standard deviations of numerical variables
-        num_std = {f'{col}_std': self.data.loc[:, col].std() for col in self.nums}
+    def overview(self):
+        gb = self.data.groupby("group")
+        series = [
+            gb.size().rename("size"),
+            gb.apply(lambda x: self[x.name].cost(self.diversity())).rename("cost"),
+        ]
 
-        return pd.Series(bool_mean | num_mean | num_std)
+        for col in self.bools:
+            series.append(gb[col].sum().rename(col))
 
-    def __getitem__(self, key):
-        return self.data.loc[self.data.group == key, :]
+        for col in self.nums:
+            series.append(
+                gb[col]
+                .agg(["mean", "std"])
+                .round(2)
+                .rename(lambda agg: f"{agg}({col})", axis=1)
+            )
+
+        return pd.concat(series, axis=1)
+
+    def __repr__(self):
+        pass

@@ -1,4 +1,5 @@
 from .cohort import Cohort
-# from .solver import Solver
+from .group import Group
+from .solver import Solver
 
-# __all__ = ["Cohort", "Solver"]
+__all__ = ["Cohort", "Group", "Solver"]
