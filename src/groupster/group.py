@@ -1,19 +1,5 @@
-import re
-
 import pandas as pd
-
-
-def cost(index, cohort_val, group_val):
-    if re.match(r"^bool_", index):
-        return abs(cohort_val - group_val)
-    elif re.match(r"^num_.*_mean$", index):
-        # The difference is normalised by the cohort mean.
-        return abs(cohort_val - group_val) / cohort_val
-    elif re.match(r"^num_.*_std$", index):
-        # The difference is normalised by the cohort mean.
-        return abs(cohort_val - group_val) / cohort_val
-    else:
-        raise ValueError(f"Cost function does not know how to handle {index}.")
+from .util import diversity_cost, restriction_cost
 
 
 class Group:
@@ -36,9 +22,9 @@ class Group:
 
         return pd.Series(bool_mean | num_mean | num_std)
 
-    def cost(self, cohort_diversity, cost_fn=None):
+    def diversity_cost(self, cohort_diversity, cost_fn=None):
         if cost_fn is None:
-            cost_fn = cost
+            cost_fn = diversity_cost
 
         return pd.Series(
             {
@@ -47,5 +33,8 @@ class Group:
             }
         ).sum()
 
-    def __repr__(self):
-        pass
+    def restriction_cost(self, keep_together=None, keep_separate=None, cost_fn=None):
+        if cost_fn is None:
+            cost_fn = restriction_cost
+
+        return cost_fn(self.data, keep_together, keep_separate)
