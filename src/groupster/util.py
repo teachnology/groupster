@@ -4,14 +4,25 @@ import pandas as pd
 
 
 def diversity(data, bools=None, nums=None):
-    # Bool variables
-    bool_mean = {f"bool_{col}": data.loc[:, col].mean() for col in bools}
+    bool_mean = (
+        {f"bool_{col}": data.loc[:, col].mean() for col in bools}
+        if bools is not None
+        else {}
+    )
 
     # Means of numerical variables
-    num_mean = {f"num_{col}_mean": data.loc[:, col].mean() for col in nums}
+    num_mean = (
+        {f"num_{col}_mean": data.loc[:, col].mean() for col in nums}
+        if nums is not None
+        else {}
+    )
 
     # Standard deviations of numerical variables
-    num_std = {f"num_{col}_std": data.loc[:, col].std() for col in nums}
+    num_std = (
+        {f"num_{col}_std": data.loc[:, col].std() for col in nums}
+        if nums is not None
+        else {}
+    )
 
     return pd.Series(bool_mean | num_mean | num_std)
 

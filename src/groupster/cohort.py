@@ -63,15 +63,17 @@ class Cohort:
             .rename("diversity_cost"),
         ]
 
-        for col in self.bools:
-            series.append(self.data.groupby("group")[col].sum().rename(col))
+        if self.bools is not None:
+            for col in self.bools:
+                series.append(self.data.groupby("group")[col].sum().rename(col))
 
-        for col in self.nums:
-            series.append(
-                self.data.groupby("group")[col]
-                .agg(["mean", "std"])
-                .round(2)
-                .rename(lambda agg: f"{agg}({col})", axis=1)
+        if self.nums is not None:
+            for col in self.nums:
+                series.append(
+                    self.data.groupby("group")[col]
+                    .agg(["mean", "std"])
+                    .round(2)
+                    .rename(lambda agg: f"{agg}({col})", axis=1)
             )
 
         return pd.concat(series, axis=1)
