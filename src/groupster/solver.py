@@ -6,11 +6,14 @@ class Solver:
         self,
         keep_together=None,
         keep_separate=None,
+        bool_min=None,
         diversity_cost_fn=None,
         restriction_cost_fn=None,
     ):
         self.keep_together = keep_together
         self.keep_separate = keep_separate
+        self.bool_min = bool_min
+
         self.diversity_cost_fn = diversity_cost_fn
         self.restriction_cost_fn = restriction_cost_fn
 
@@ -25,6 +28,7 @@ class Solver:
             ) + group.restriction_cost(
                 keep_together=self.keep_together,
                 keep_separate=self.keep_separate,
+                bool_min=self.bool_min,
                 cost_fn=self.restriction_cost_fn,
             )
 
@@ -88,6 +92,7 @@ class Solver:
                     restriction_cost = cohort.restriction_cost(
                         keep_together=self.keep_together,
                         keep_separate=self.keep_separate,
+                        bool_min=self.bool_min,
                         cost_fn=self.restriction_cost_fn,
                     )
                     acceptance_rate = accepted / (n // 10)

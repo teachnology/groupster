@@ -20,8 +20,10 @@ class Group:
             group_diversity=self.diversity,
         )
 
-    def restriction_cost(self, keep_together=None, keep_separate=None, cost_fn=None):
+    def restriction_cost(
+        self, keep_together=None, keep_separate=None, bool_min=None, cost_fn=None
+    ):
         if cost_fn is None:
             cost_fn = restriction_cost
 
-        return cost_fn(self.data, keep_together, keep_separate)
+        return cost_fn(self.data, keep_together, keep_separate, bool_min)

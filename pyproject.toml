@@ -5,11 +5,7 @@ description = "Python package for building diverse and fair group"
 readme = "README.md"
 authors = [{ name = "Marijan Beg", email = "m.beg@imperial.ac.uk" }]
 requires-python = ">=3.13"
-dependencies = [
-    "fakeitmakeit>=2024.11.0",
- "pandas>=2.2.3",
- "tqdm>=4.67.1",
-]
+dependencies = ["fakeitmakeit>=2024.11.0", "pandas>=2.2.3", "tqdm>=4.67.1"]
 license = "MIT"
 keywords = [
     "groups",

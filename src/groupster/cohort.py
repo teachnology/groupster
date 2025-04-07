@@ -40,12 +40,15 @@ class Cohort:
             }
         ).sum()
 
-    def restriction_cost(self, keep_together=None, keep_separate=None, cost_fn=None):
+    def restriction_cost(
+        self, keep_together=None, keep_separate=None, bool_min=None, cost_fn=None
+    ):
         return pd.Series(
             {
                 group: self[group].restriction_cost(
                     keep_together=keep_together,
                     keep_separate=keep_separate,
+                    bool_min=bool_min,
                     cost_fn=cost_fn,
                 )
                 for group in self.data.group.unique()

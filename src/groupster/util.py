@@ -37,7 +37,7 @@ def diversity_cost(cohort_diversity, group_diversity):
     return cost
 
 
-def restriction_cost(data, keep_together=None, keep_separate=None):
+def restriction_cost(data, keep_together=None, keep_separate=None, bool_min=None):
     cost = 0
 
     if keep_together is not None:
@@ -51,5 +51,9 @@ def restriction_cost(data, keep_together=None, keep_separate=None):
             cost += (
                 data.index.isin(i).sum() ** 2  # square to add nonlinearity
             )  # positive cost if people are not separate
+
+    if bool_min is not None:
+        for name, n in bool_min.items():
+            cost += (data[name].sum() < n) * 10
 
     return cost
