@@ -1,5 +1,7 @@
 import functools
+
 import pandas as pd
+
 from .group import Group
 from .util import diversity
 

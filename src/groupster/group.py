@@ -1,5 +1,4 @@
-import pandas as pd
-from .util import diversity_cost, restriction_cost, diversity
+from .util import diversity, diversity_cost, restriction_cost
 
 
 class Group:
