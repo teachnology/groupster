@@ -1,5 +1,3 @@
-# Prefixed with an underscore to prevent pytest from running it.
-
 import pathlib
 
 import fakeitmakeit as fm

@@ -82,7 +82,7 @@ class TestRestriction:
         solver.solve(cohort=cohort, n=2000)
 
         for subset in keep_together:
-            assert cohort.data.loc[subset, "group"].value_counts.size() == 1
+            assert cohort.data.loc[subset, "group"].value_counts().size == 1
 
     def test_keep_separate(self, data, groups):
         cohort = gr.Cohort(data=data, groups=groups)
@@ -92,7 +92,7 @@ class TestRestriction:
         solver.solve(cohort=cohort, n=2000)
 
         for subset in keep_separate:
-            assert cohort.data.loc[subset, "group"].value_counts.size() == len(subset)
+            assert cohort.data.loc[subset, "group"].value_counts().size == len(subset)
 
     def test_bool_min(self, data):
         groups = {f"g{i}": 7 for i in range(1, 8)}
