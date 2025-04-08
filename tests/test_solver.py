@@ -1,8 +1,9 @@
 import pathlib
-import pytest
-import groupster as gr
-import numpy as np
+
 import pandas as pd
+import pytest
+
+import groupster as gr
 
 CWD = pathlib.Path(__file__).parent
 
@@ -81,7 +82,7 @@ class TestRestriction:
         solver.solve(cohort=cohort, n=2000)
 
         for subset in keep_together:
-            assert cohort.data.loc[subset, "group"].nunique() == 1
+            assert cohort.data.loc[subset, "group"].value_counts.size() == 1
 
     def test_keep_separate(self, data, groups):
         cohort = gr.Cohort(data=data, groups=groups)
@@ -91,12 +92,12 @@ class TestRestriction:
         solver.solve(cohort=cohort, n=2000)
 
         for subset in keep_separate:
-            assert cohort.data.loc[subset, "group"].nunique() == len(subset)
+            assert cohort.data.loc[subset, "group"].value_counts.size() == len(subset)
 
     def test_bool_min(self, data):
-        groups = {f'g{i}': 7 for i in range(1, 8)}
-        cohort = gr.Cohort(data=data, groups=groups, bools=['edsml'])
-        solver = gr.Solver(bool_min={'edsml': 3})
+        groups = {f"g{i}": 7 for i in range(1, 8)}
+        cohort = gr.Cohort(data=data, groups=groups, bools=["edsml"])
+        solver = gr.Solver(bool_min={"edsml": 3})
 
         solver.solve(cohort=cohort, n=2000)
 

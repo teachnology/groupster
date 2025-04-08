@@ -74,6 +74,6 @@ class Cohort:
                     .agg(["mean", "std"])
                     .round(2)
                     .rename(lambda agg: f"{agg}({col})", axis=1)
-            )
+                )
 
         return pd.concat(series, axis=1)

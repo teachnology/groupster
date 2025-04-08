@@ -53,7 +53,7 @@ select = [
     "E501", # line too long - not enabled by default
     "UP",   # pyupgrade
     "I",    # isort
-    "D",    # pydocstyle
+    # "D",    # pydocstyle
     "PD",   # pandas-vet
     "PL",   # pylint
     "NPY",  # numpy

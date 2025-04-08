@@ -1,8 +1,9 @@
-import groupster as gr
 import pathlib
-import pandas as pd
-import numpy as np
 
+import numpy as np
+import pandas as pd
+
+import groupster as gr
 
 CWD = pathlib.Path(__file__).parent
 data = pd.read_csv(CWD / "data" / "cohort.csv", index_col="username")
