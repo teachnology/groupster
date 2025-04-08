@@ -1,7 +1,7 @@
 [project]
 name = "groupster"
-version = "2024.11.0"
-description = "Python package for building diverse and fair group"
+version = "2025.04.0"
+description = "Python package for building diverse and fair groups."
 readme = "README.md"
 authors = [{ name = "Marijan Beg", email = "m.beg@imperial.ac.uk" }]
 requires-python = ">=3.13"
@@ -26,7 +26,7 @@ classifiers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/marijanbeg/groupster"
+Repository = "https://github.com/teachnology/groupster"
 
 [build-system]
 requires = ["hatchling"]
@@ -76,4 +76,4 @@ convention = "numpy"
 omit = ["tests/*.py"]
 
 [tool.pytest.ini_options]
-addopts = "-v -n auto --doctest-modules --cov=fakeitmakeit --cov-report=html --cov-report=term"
+addopts = "-v -n auto --doctest-modules --cov=groupster --cov-report=html --cov-report=term"
