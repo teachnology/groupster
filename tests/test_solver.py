@@ -1,16 +1,24 @@
 import pathlib
-
+import pytest
 import groupster as gr
 import numpy as np
 import pandas as pd
 
 CWD = pathlib.Path(__file__).parent
-data = pd.read_csv(CWD / "data" / "cohort.csv", index_col="username")
-groups = {"g1": 10, "g2": 10, "g3": 10, "g4": 10, "g5": 9}
+
+
+@pytest.fixture(scope="function")
+def data():
+    return pd.read_csv(CWD / "data" / "cohort.csv", index_col="username")
+
+
+@pytest.fixture(scope="function")
+def groups():
+    return {"g1": 10, "g2": 10, "g3": 10, "g4": 10, "g5": 9}
 
 
 class TestBools:
-    def test_solve(self):
+    def test_solve(self, data, groups):
         cohort = gr.Cohort(data=data, groups=groups, bools=["female"])
         solver = gr.Solver()
 
@@ -35,54 +43,61 @@ class TestBools:
 
 
 class TestNums:
-    def test_solve(self):
+    def test_solve(self, data, groups):
         cohort = gr.Cohort(data=data, groups=groups, nums=["mark"])
         solver = gr.Solver()
 
-        mean_initial_std = (
-            cohort.data.groupby("group").mark.mean().sub(cohort.data.mark.mean()).std()
-        )
-        std_initial_std = (
-            cohort.data.groupby("group").mark.std().sub(cohort.data.mark.std()).std()
-        )
+        initial_overview = cohort.overview()
+        solver.solve(cohort=cohort, n=2000)
+        final_overview = cohort.overview()
 
-        solver.solve(cohort=cohort, n=500)
-
-        mean_final_std = (
-            cohort.data.groupby("group").mark.mean().sub(cohort.data.mark.mean()).std()
-        )
-        std_final_std = (
-            cohort.data.groupby("group").mark.std().sub(cohort.data.mark.std()).std()
-        )
-
-        # We expect the ranges to decrease.
-        assert mean_final_std < mean_initial_std
-        assert std_final_std < std_initial_std
+        # We expect the variability (std) of mean and std to decrease.
+        assert final_overview["mean(mark)"].std() < initial_overview["mean(mark)"].std()
+        assert final_overview["std(mark)"].std() < initial_overview["std(mark)"].std()
 
 
 class TestMixed:
-    def test_solve(self):
+    def test_solve(self, data, groups):
         cohort = gr.Cohort(data=data, groups=groups, bools=["female"], nums=["mark"])
         solver = gr.Solver()
 
-        mean_initial_std = (
-            cohort.data.groupby("group").mark.mean().sub(cohort.data.mark.mean()).std()
-        )
-        std_initial_std = (
-            cohort.data.groupby("group").mark.std().sub(cohort.data.mark.std()).std()
-        )
+        initial_overview = cohort.overview()
+        solver.solve(cohort=cohort, n=2000)
+        final_overview = cohort.overview()
 
-        solver.solve(cohort=cohort, n=500)
+        # We expect the variability (std) of mean and std to decrease.
+        assert final_overview["mean(mark)"].std() < initial_overview["mean(mark)"].std()
+        assert final_overview["std(mark)"].std() < initial_overview["std(mark)"].std()
 
-        mean_final_std = (
-            cohort.data.groupby("group").mark.mean().sub(cohort.data.mark.mean()).std()
-        )
-        std_final_std = (
-            cohort.data.groupby("group").mark.std().sub(cohort.data.mark.std()).std()
-        )
+        assert final_overview.female.between(2, 3).all()
 
-        # We expect the ranges to decrease.
-        assert mean_final_std < mean_initial_std
-        assert std_final_std < std_initial_std
 
-        assert cohort.data.groupby("group").female.sum().between(2, 3).all()
+class TestRestriction:
+    def test_keep_together(self, data, groups):
+        cohort = gr.Cohort(data=data, groups=groups)
+        keep_together = [["ff402", "yjt99", "cr947"], ["jr848", "fs81"]]
+        solver = gr.Solver(keep_together=keep_together)
+
+        solver.solve(cohort=cohort, n=2000)
+
+        for subset in keep_together:
+            assert cohort.data.loc[subset, "group"].nunique() == 1
+
+    def test_keep_separate(self, data, groups):
+        cohort = gr.Cohort(data=data, groups=groups)
+        keep_separate = [["ff402", "yjt99", "cr947"], ["jr848", "fs81"]]
+        solver = gr.Solver(keep_separate=keep_separate)
+
+        solver.solve(cohort=cohort, n=2000)
+
+        for subset in keep_separate:
+            assert cohort.data.loc[subset, "group"].nunique() == len(subset)
+
+    def test_bool_min(self, data):
+        groups = {f'g{i}': 7 for i in range(1, 8)}
+        cohort = gr.Cohort(data=data, groups=groups, bools=['edsml'])
+        solver = gr.Solver(bool_min={'edsml': 3})
+
+        solver.solve(cohort=cohort, n=2000)
+
+        assert cohort.overview().edsml.value_counts().index.isin([3, 0]).all()

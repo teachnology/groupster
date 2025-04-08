@@ -40,8 +40,10 @@ def diversity_cost(cohort_diversity, group_diversity):
             # The difference is normalised by the cohort mean.
             cost += abs(cohort_val - group_val) / cohort_val
         elif re.match(r"^num_.*_std$", idx):
-            # The difference is normalised by the cohort std.
-            cost += abs(cohort_val - group_val) / cohort_val
+            # The difference is normalised by the cohort mean of the same variable.
+            variable_name = re.match(r"^num_(.*)_std$", idx).group(1)
+            cohort_mean = cohort_diversity.loc[f"num_{variable_name}_mean"]
+            cost += abs(cohort_val - group_val) / cohort_mean
         else:
             raise ValueError(f"Cost function does not know how to handle {idx}.")
 

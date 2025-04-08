@@ -40,7 +40,7 @@ class TestCosts:
         cost = (
             abs(0.2653 - 0.2)  # female
             + abs(64.381 - 65.7451) / 65.7451  # mark mean
-            + abs(4.2121 - 5.38341) / 5.38341  # mark std
+            + abs(4.2121 - 5.38341) / 65.7451  # mark std
         )
         assert np.isclose(
             group.diversity_cost(cohort_diversity=cohort.diversity),
