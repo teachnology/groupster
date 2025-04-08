@@ -59,7 +59,10 @@ class Cohort:
         series = [
             self.data.groupby("group").size().rename("size"),
             self.data.groupby("group")
-            .apply(lambda x: self[x.name].diversity_cost(self.diversity))
+            .apply(
+                lambda x: self[x.name].diversity_cost(self.diversity),
+                include_groups=False,
+            )
             .rename("diversity_cost"),
         ]
 
