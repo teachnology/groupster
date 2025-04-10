@@ -2,6 +2,27 @@ from tqdm import tqdm
 
 
 class Solver:
+    """A solver class to minimise the cost of a cohort.
+
+    Parameters
+    ----------
+    keep_together : list of list of str, optional
+        A list of lists of indices in ``data`` that should be kept together.
+    keep_separate : list of list of str, optional
+        A list of lists of indices in ``data`` that should be kept separate.
+    bool_min : float, optional
+        The minimum number of people with the boolean characteristic in the group.
+        For example, if we want at least two females in each group, we can set
+        ``bool_min={'female': 2}``.
+    diversity_cost_fn : callable, optional
+        A function to compute the diversity cost of a group. The default is
+        `util.diversity_cost`.
+    restriction_cost_fn : callable, optional
+        A function to compute the restriction cost of a group. The default is
+        `util.restriction_cost`.
+
+    """
+
     def __init__(
         self,
         keep_together=None,
@@ -20,6 +41,25 @@ class Solver:
         self._cached_cost = {}
 
     def _cost(self, group, cohort, use_cache=False):
+        """Compute the cost of a group.
+
+        The cost is computed as the sum of the diversity cost and the restriction cost.
+        The cost is cached to avoid recomputing it.
+
+        Parameters
+        ----------
+        group : Group
+            The group to compute the cost for.
+        cohort : Cohort
+            The cohort used to compute the diversity cost.
+        use_cache : bool, optional
+            Whether to use the cached cost. The default is False.
+
+        Returns
+        -------
+        float
+            The cost of the group.
+        """
         group_name = group.data.group.iloc[0]
 
         if not use_cache:
@@ -43,6 +83,22 @@ class Solver:
             return self._cached_cost[group_name]
 
     def _step(self, cohort):
+        """Perform a single step of the algorithm.
+
+        This method selects two people at random from different groups and swaps their
+        groups. If the cost of the new groups is lower than the cost of the old groups,
+        the swap is accepted. Otherwise, the swap is rejected.
+
+        Parameters
+        ----------
+        cohort : Cohort
+            The cohort to solve.
+
+        Returns
+        -------
+        bool
+            Whether the swap was accepted or not.
+        """
         # Select two people at random from different groups.
         while True:
             [(_, a), (_, b)] = cohort.data.sample(n=2, replace=False).iterrows()
@@ -72,6 +128,22 @@ class Solver:
             return False
 
     def solve(self, cohort, n):
+        """Solve the cohort by minimising the cost.
+
+        This method performs a number of steps to minimise the cost of the cohort. The
+        number of steps is specified by the ``n`` parameter. Each step is performed by
+        ``_step`` method.
+
+        The Progress bar updates the cost and acceptance rate every 10% of the steps.
+
+        Parameters
+        ----------
+        cohort : Cohort
+            The cohort to solve.
+        n : int
+            The number of steps to perform.
+
+        """
         progress_bar = tqdm(range(n), desc="Solving")
         progress_bar.set_postfix(
             {
