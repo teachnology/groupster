@@ -33,7 +33,7 @@ class Cohort:
     def __init__(self, data, groups, bools=None, nums=None):
         self.data = data.assign(
             group=pd.Series(
-                [group for group, count in groups.items() for _ in range(count)]
+                [group for group, count in groups.items() for _ in range(count)]  # check np.repeat
             )
             .sample(frac=1)
             .to_list()
